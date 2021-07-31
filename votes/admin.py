@@ -1,6 +1,5 @@
 from django.contrib import admin
 from .models import (
-   RegisteredVoter,
    Vote,
    Voter,
    Party,
@@ -15,4 +14,4 @@ admin.site.register(Vote)
 admin.site.register(Candidate)
 admin.site.register(Party)
 admin.site.register(VotingEvent)
-admin.site.register()
+admin.site.register(RegisteredVoter)

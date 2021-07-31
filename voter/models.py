@@ -7,7 +7,6 @@ from django.db.models.deletion import PROTECT
 
 class Voter(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
-    id_number = models.CharField(max_length=13,unique=True)
     voting_token = models.CharField(PROTECT,editable=True,max_length=256)
 
 
