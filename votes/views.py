@@ -20,7 +20,7 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views.generic import View
-from .serializers import PartySerializer,VoteSerializer,CandidateSerializer
+from .serializers import PartySerializer, RegisteredSerializer,VoteSerializer,CandidateSerializer, VotingEventSerializer
 from django.http.response import JsonResponse
 from datetime import datetime
 
@@ -63,9 +63,10 @@ class RegisteredVoterViewSet(viewsets.ModelViewSet):
     """
     A view for voting
     """
-    
-    queryset = Vote.objects.all()
-    serializer_class = VoteSerializer
+    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
+    permission_classes = (IsAuthenticated,)
+    queryset = RegisteredVoter.objects.all()
+    serializer_class = RegisteredSerializer
     filter_backends = (DjangoFilterBackend,)
     http_method_names = ['post']
 
@@ -75,10 +76,8 @@ class VotingEventViewSet(viewsets.ModelViewSet):
     """
     A view for latest voting event.
     """
-    authentication_classes = (SessionAuthentication, BasicAuthentication, TokenAuthentication)
-    permission_classes = (IsAuthenticated,)
-    queryset = Vote.objects.all()
-    serializer_class = VoteSerializer
+    queryset = VotingEvent.objects.exclude(date_of_event__lt=datetime.now())[:1]
+    serializer_class = VotingEventSerializer
     filter_backends = (DjangoFilterBackend,)
     http_method_names = ['get']
 

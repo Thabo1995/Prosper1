@@ -29,8 +29,11 @@ class VotingEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = VotingEvent
         fields = (
+            'id',
             'title',
             'date_of_event',
+            'date_of_event_registration',
+            'closing_date_of_event_registration',
             'is_closed',
             )
 
