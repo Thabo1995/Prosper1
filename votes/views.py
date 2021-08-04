@@ -21,6 +21,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views.generic import View
 from .serializers import PartySerializer,VoteSerializer,CandidateSerializer
+from django.http.response import JsonResponse
 
 
 
@@ -81,4 +82,15 @@ class VotingEventViewSet(viewsets.ModelViewSet):
     serializer_class = VoteSerializer
     filter_backends = (DjangoFilterBackend,)
     http_method_names = ['get']
+
+
+def validate_username(request,username):
+    """Check username availability"""
+    response = {
+        'username_is_taken': User.objects.filter(username__iexact=username).exists(),
+        # 'email_is_taken': User.objects.filter(email__iexact=email).exists()
+    }
+
+    print(response)
+    return JsonResponse(data=response)
     

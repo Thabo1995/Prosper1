@@ -21,6 +21,6 @@ from votes import urls as vote_urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/',include(vote_urls)),
-    path('api/auth/',include('rest_auth.urls')),
-    path('api/auth/registration/', include('rest_auth.registration.urls')),
+    path('api/auth/',include('dj_rest_auth.urls')),
+    path('api/auth/registration/', include('dj_rest_auth.registration.urls')),
 ]

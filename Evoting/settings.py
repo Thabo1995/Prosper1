@@ -25,7 +25,7 @@ SECRET_KEY = 'sx_nnmx=6^%3@rgsxa_(lwjz2&=2&x^t1)5(_vwlai#*=1*g^z'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -42,22 +42,30 @@ INSTALLED_APPS = [
     'votes',
     'rest_framework',
     'rest_framework.authtoken',
-    'rest_auth',
+    'dj_rest_auth',
     'allauth',
     'allauth.account',
-    # 'rest_auth.registration',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.google',
+    'dj_rest_auth.registration',
+    'corsheaders',
     'django_filters',
+    'storages',
 
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
 ]
 
 ROOT_URLCONF = 'Evoting.urls'
@@ -130,3 +138,43 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 SITE_ID = 1
+
+
+EMAIL_BACKEND = "sendgrid_backend.SendgridBackend"
+SENDGRID_API_KEY = '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'
+SENDGRID_SANDBOX_MODE_IN_DEBUG = False
+
+DEFAULT_FROM_EMAIL = "noreply@khonis.co.za"
+
+#All-auth settings
+ACCOUNT_EMAIL_REQUIRED=False
+ACCOUNT_AUTHENTICATION_METHOD = "username"
+ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_USERNAME_REQUIRED = True
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        # 'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    )
+}
+
+
+CORS_ALLOWED_ORIGINS = [
+    "https://kabook.co.za",
+    "https://www.kabook.co.za",
+    "http://api.kabook.co.za",
+    "http://localhost:8000",
+    "http://localhost:4200",
+    "https://kabook.herokuapp.com",
+    "http://kabook.herokuapp.com",
+    "https://www.testkabook.co.za",
+    "http://www.testkabook.co.za",
+    "http://testkabook.co.za",
+    "https://testkabook.co.za",
+]
