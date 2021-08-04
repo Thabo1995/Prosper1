@@ -22,7 +22,7 @@ from rest_framework.views import APIView
 from django.views.generic import View
 from .serializers import PartySerializer,VoteSerializer,CandidateSerializer
 from django.http.response import JsonResponse
-
+from datetime import datetime
 
 
 class PartyViewSet(viewsets.ModelViewSet):
@@ -33,7 +33,6 @@ class PartyViewSet(viewsets.ModelViewSet):
     serializer_class = PartySerializer
     filter_backends = (DjangoFilterBackend,)
     http_method_names = ['get']
-
 
 
 class CandidateViewSet(viewsets.ModelViewSet):
@@ -94,3 +93,17 @@ def validate_username(request,username):
     print(response)
     return JsonResponse(data=response)
     
+
+def check_registration_status(request,username):
+    """Check username availability"""
+    
+    latest_voting_event = VotingEvent.objects.exclude(
+        date_of_event__lt=datetime.now())[:1]
+    response = {
+        'username_exist': User.objects.filter(username__iexact=username).exists(),
+        'registered_to_vote': RegisteredVoter.objects.filter(user__username__iexact=username,voting_event=latest_voting_event[0].pk).exists(),
+        # 'email_is_taken': User.objects.filter(email__iexact=email).exists()
+    }
+
+    print(response)
+    return JsonResponse(data=response)

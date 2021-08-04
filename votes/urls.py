@@ -9,7 +9,9 @@ from .views import (
     VoteViewSet,
     VotingEventViewSet,
     RegisteredVoterViewSet,
-    validate_username
+    check_registration_status,
+    validate_username,
+    check_registration_status
     )
 
 
@@ -24,4 +26,5 @@ api_router.register('voting/vote',VoteViewSet)
 urlpatterns = [
     path('',include(api_router.urls)),
     path('validate-username/<slug:username>/', validate_username,name='validate_username'),
+    path('check-status/<slug:username>/', check_registration_status,name='validate_username'),
 ]
