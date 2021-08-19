@@ -46,4 +46,5 @@ class RegisteredVoter(models.Model):
 class Vote(models.Model):
     voting_event = models.ForeignKey(VotingEvent, on_delete=models.CASCADE)
     voter = models.ForeignKey(RegisteredVoter, unique=True, on_delete=models.CASCADE)
+    party = models.ForeignKey(Party, on_delete=models.CASCADE)
     

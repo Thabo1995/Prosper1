@@ -6,6 +6,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (
     PartyViewSet,
     CandidateViewSet,
+    ResultsViewSet,
+    UserViewSet,
     VoteViewSet,
     VotingEventViewSet,
     RegisteredVoterViewSet,
@@ -27,4 +29,6 @@ urlpatterns = [
     path('',include(api_router.urls)),
     path('validate-username/<slug:username>/', validate_username,name='validate_username'),
     path('check-status/<slug:username>/', check_registration_status,name='validate_username'),
+    path('user-details/', UserViewSet.as_view()),
+    path('voting-results/', ResultsViewSet.as_view(),name="get_voting_results"),
 ]

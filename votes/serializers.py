@@ -21,6 +21,7 @@ class VoteSerializer(serializers.ModelSerializer):
         fields = (
             'voting_event',
             'voter',
+            'party'
             )
 
 
@@ -39,13 +40,16 @@ class VotingEventSerializer(serializers.ModelSerializer):
 
 
 
+
 class PartySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Party
         fields = (
+            'id',
             'name',
             'short_name',
+            'logo',
             )
 
 
@@ -63,6 +67,22 @@ class RegisteredSerializer(serializers.ModelSerializer):
     class Meta:
         model = RegisteredVoter
         fields = (
+            'id',
             'voting_event',
-            'string'
+            'string',
+            'user'
             )
+
+
+
+class UserSerializers(serializers.ModelSerializer):
+    
+    class Meta:
+        model = User
+        fields = [
+            'pk',
+            'email',
+            'username',
+            'first_name',
+            'last_name',
+        ]

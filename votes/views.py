@@ -1,11 +1,15 @@
-from django.shortcuts import render
+import json
+from typing import Match
+from django.db.models.aggregates import Count, Max
+from django.db.models.query_utils import Q
+from django.shortcuts import render, get_object_or_404
 from .models import (
    Vote,
    Voter,
    Party,
    Candidate,
    VotingEvent,
-   RegisteredVoter
+   RegisteredVoter,
 )
 
 from rest_framework import viewsets , serializers
@@ -20,9 +24,10 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.views.generic import View
-from .serializers import PartySerializer, RegisteredSerializer,VoteSerializer,CandidateSerializer, VotingEventSerializer
+from .serializers import PartySerializer, RegisteredSerializer, UserSerializers,VoteSerializer,CandidateSerializer, VotingEventSerializer
 from django.http.response import JsonResponse
 from datetime import datetime
+from rest_framework import status
 
 
 class PartyViewSet(viewsets.ModelViewSet):
@@ -68,7 +73,11 @@ class RegisteredVoterViewSet(viewsets.ModelViewSet):
     queryset = RegisteredVoter.objects.all()
     serializer_class = RegisteredSerializer
     filter_backends = (DjangoFilterBackend,)
-    http_method_names = ['post']
+
+
+    def get_queryset(self):
+        user = self.request.user
+        return RegisteredVoter.objects.filter(user=user)
 
 
 
@@ -101,8 +110,68 @@ def check_registration_status(request,username):
     response = {
         'username_exist': User.objects.filter(username__iexact=username).exists(),
         'registered_to_vote': RegisteredVoter.objects.filter(user__username__iexact=username,voting_event=latest_voting_event[0].pk).exists(),
-        # 'email_is_taken': User.objects.filter(email__iexact=email).exists()
+
     }
 
     print(response)
     return JsonResponse(data=response)
+
+
+class UserViewSet(APIView):
+    serializer_class = UserSerializers
+    authentication_classes = [
+        BasicAuthentication,
+        TokenAuthentication,
+        SessionAuthentication,
+    ]
+    queryset = User.objects.all()
+    permission_classes = (IsAuthenticated,)
+    http_method_names = ['get']
+
+    def get(self, request, format=None):
+        """
+        Return a list of all users.
+        """
+        user = request.user.username
+        user_details = get_object_or_404(User,username=user)
+        
+        data = {
+            'pk': user_details.pk,
+            'username': user_details.username,
+            'email': user_details.email,
+            'first_name': user_details.first_name,
+            'last_name': user_details.last_name,
+            'last_login': user_details.last_login,
+        }
+        return Response(data,status=status.HTTP_200_OK)
+
+
+class ResultsViewSet(APIView):
+    
+    def get(self, request, format=None):
+        """
+        Returns the results of different voting events.
+        Query excludes dates greater than now and if its not closed.
+        """
+        parties = Party.objects.filter(
+        ).prefetch_related()
+        
+        voting_event = parties.values('vote__voting_event').last()
+        votes = parties.exclude(
+            vote__voting_event__date_of_event__gt=datetime.now(),
+            vote__voting_event__is_closed = False
+        ).annotate(number_of_votes=Count('vote')).values(
+            'name',
+            'short_name',
+            'logo',
+            'number_of_votes',
+            'vote__voting_event',
+        ).order_by('-number_of_votes')
+        print(voting_event['vote__voting_event'])
+        print(votes)
+
+        
+        data = list(votes)
+
+        return Response(data,status=status.HTTP_200_OK)
+
