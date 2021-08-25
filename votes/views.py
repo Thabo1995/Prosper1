@@ -167,11 +167,21 @@ class ResultsViewSet(APIView):
             'number_of_votes',
             'vote__voting_event',
         ).order_by('-number_of_votes')
-        print(voting_event['vote__voting_event'])
-        print(votes)
-
         
-        data = list(votes)
 
-        return Response(data,status=status.HTTP_200_OK)
+
+        data = list(votes)
+        print(data)
+        new_data = []
+        sum = 0
+        for d in data:
+            sum = sum + d['number_of_votes']
+            
+        for d in data:
+            d['vote_percentage'] = d['number_of_votes'] / sum * 100
+            new_data.append(d)
+        
+        new_data = sorted(new_data, key=lambda d: d['number_of_votes']) 
+
+        return Response(new_data,status=status.HTTP_200_OK)
 
